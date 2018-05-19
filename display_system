@@ -1,0 +1,83 @@
+#!/bin/bash
+# CPU Infos
+function cpuinfo {
+  CPUINFO=$(cat /proc/cpuinfo | grep "model name" | uniq -c | cut -d':' -f2|xargs)
+  MANUFACTURER=$(cat /proc/cpuinfo | grep "vendor_id" | uniq -c | cut -d':' -f2|xargs)
+  CORES=$(cat /proc/cpuinfo | grep "model name" | uniq -c | cut -d':' -f1 |xargs|cut -d' ' -f1)
+  SPEED=$(cat /proc/cpuinfo | grep "MHz" | xargs|cut -d':' -f2 | xargs)
+  LOAD=$(cat /proc/loadavg | awk '{ print $1,$2,$3}')
+}
+# RAM Infos
+function raminfo {
+  TOTALRAM=$(expr $(cat /proc/meminfo | grep "MemTotal" | cut -d':' -f2 | xargs  | cut -d' ' -f1 | xargs) / 1024)
+  FREERAM=$(expr $(cat /proc/meminfo | grep "MemFree" | cut -d':' -f2  | xargs | cut -d' ' -f1 | xargs) / 1024)
+  USEDRAM=$(expr $TOTALRAM - $FREERAM)
+}
+# Partitionen
+function partinfo {
+  PARTITIONS=$(df -h | grep -v "tmpfs\|devtmpfs\|udev" | grep "/" | cut -d' ' -f1)
+  set -f
+  array=(${PARTITIONS// / })
+  for i in "${!array[@]}"
+  do
+    PERCENT=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f5)
+    USED=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f3)
+    GESAMT=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f2)
+    MOUNT=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f6)
+    echo -e "Partition \e[1m$MOUNT\e[0m ($PERCENT)  \t: $USED / $GESAMT"
+  done
+}
+# IP Info
+function ipinfo {
+  IPS=$(ip -o addr | grep -v "127.0.0.1" | grep -v "::1/128" | grep -v "fe80::" | awk '{printf "%s\t\t\t%s\n",$2,$4}')
+}
+# RAID Info
+function raidinfo {
+  mdstat=$(cat /proc/mdstat)
+}
+# Screen Info
+function screeninfo {
+  SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
+}
+# MySQL Info
+function mysqlinfo {
+  MYSQLINFO=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
+}
+# BGP Infos
+function bgpinfo {
+  BGPINFO=$(echo "IPv4:" && birdc sh p | grep "BGP" && echo "IPv6:" && birdc6 sh p | grep "BGP")
+}
+echo -e "===\tCPU INFO\t==="
+cpuinfo
+echo "$CPUINFO ($MANUFACTURER)"
+echo "$CORES x $SPEED"
+echo "Load: $LOAD"
+raminfo
+echo -e "\n===\tRAM INFO\t==="
+echo "Used RAM / Total RAM"
+echo "$USEDRAM MB / $TOTALRAM MB"
+ipinfo
+echo -e "\n===\tIPs INFO\t==="
+echo "IP Adressen:"
+echo "$IPS"
+echo -e "\n===\tHDD INFO\t==="
+partinfo
+if [ -a "/proc/mdstat" ]
+then
+  raidinfo
+  echo -e "\n===\tRAID INFO\t==="
+  echo "$mdstat"
+fi
+echo -e "\n===\tMisc INFO\t==="
+screeninfo
+echo -e "Screen Sessions:\t$SCREENINFO"
+if [ -x "$(command -v mysqld)" ];
+then
+  mysqlinfo
+  echo -e "Datenbanken:\t$MYSQLINFO"
+fi
+if [ -x "$(command -v birdc)" ];
+then
+  bgpinfo
+  echo -e "BGP Peers:\n$BGPINFO"
+fi
