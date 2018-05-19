@@ -100,14 +100,15 @@ function varnish {
   echo -e "\n===\tVARNISH\t==="
   $VARNISHADM backend.list -p
 }
+function birdc {
+  echo -e "\n===\tBGP IPv4\t==="
+
+}
 function screeninfo {
   SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
 }
 function mysqlinfo {
   MYSQLINFO=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
-}
-function bgpinfo {
-  BGPINFO=$(echo "IPv4:" && birdc sh p | grep "BGP" && echo "IPv6:" && birdc6 sh p | grep "BGP")
 }
 
 
@@ -128,6 +129,10 @@ if [ -n "$VARNISHADM" ]
 then
   varnish
 fi
+if [ -n "$BIRDC" ]
+then
+  birdc
+fi
 echo -e "\n===\tMisc INFO\t==="
 screeninfo
 echo -e "Screen Sessions:\t$SCREENINFO"
@@ -135,9 +140,4 @@ if [ -x "$(command -v mysqld)" ];
 then
   mysqlinfo
   echo -e "Datenbanken:\t$MYSQLINFO"
-fi
-if [ -x "$(command -v birdc)" ];
-then
-  bgpinfo
-  echo -e "BGP Peers:\n$BGPINFO"
 fi
