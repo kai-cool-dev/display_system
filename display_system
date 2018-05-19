@@ -18,6 +18,7 @@ BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
 QM="$(which qm)"
+NGINX="$(which nginx)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -135,6 +136,15 @@ function mysqlinfo {
   DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
   echo "Datenbanken: $DBS"
 }
+function nginxinfo {
+  STATUS="$(systemctl status nginx | awk '/Active:/ {print $2}')"
+  if [[ "$STATUS" == "active" ]]
+  then
+    echo -e "NGINX:\t\e[32m$STATUS\e[0m"
+  else
+    echo -e "NGINX:\t\e[31m$STATUS\e[0m"
+  fi
+}
 
 
 # MAIN ROUTINE
@@ -166,4 +176,8 @@ echo -e "\n===\tMisc INFO\t==="
 if [ -n "$SCREEN" ]
 then
   screeninfo
+fi
+if [ -n "$NGINX" ]
+then
+  nginxinfo
 fi
