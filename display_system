@@ -27,6 +27,7 @@ DNSD="$(which pdns_server)"
 DNSADM="$(which pdns_control)"
 POSTFIX="$(which postfix)"
 DOVECOT="$(which dovecot)"
+NTOPNG="$(which ntopng)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -247,5 +248,10 @@ fi
 if [ -n "$DOVECOT" ]
 then
   SN="$DOVECOT"
+  serviceinfo
+fi
+if [ -n "$NTOPNG" ]
+then
+  SN="$NTOPNG"
   serviceinfo
 fi
