@@ -97,6 +97,10 @@ function proxmox {
     fi
   done
 }
+function varnish {
+  echo -e "\n===\tVARNISH\t==="
+  varnishadm backend.list -p
+}
 function screeninfo {
   SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
 }
@@ -120,6 +124,10 @@ fi
 if [ -n "$QM" ]
 then
   proxmox
+fi
+if [ -n "$VARNISHADM" ]
+then
+  varnish
 fi
 echo -e "\n===\tMisc INFO\t==="
 screeninfo
