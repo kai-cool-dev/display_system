@@ -68,8 +68,12 @@ function raidinfo {
     TYPE="$($MDADM --detail $MDEV | grep "Raid Level" | cut -d':' -f2 | xargs)"
     if [[ "$RAIDSTATUS" == *"degraded"* ]]
     then
-      FAULTY="$(mdadm --detail $MDEV | awk '/faulty/ {printf("%s (%s)", $6,$5)}')"
-      echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: $FAULTY\e[0m"
+      if [[ "$RAIDSTATUS" == *"recovering"* ]]
+      then
+      else
+        FAULTY="$(mdadm --detail $MDEV | awk '/faulty/ {printf("%s (%s)", $6,$5)}')"
+        echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: $FAULTY\e[0m"
+      fi
     else
       echo -e "\e[32m$MDEV ($TYPE) - $RAIDSTATUS\e[0m"
     fi
