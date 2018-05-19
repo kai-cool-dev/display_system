@@ -22,6 +22,9 @@ NGINX="$(which nginx)"
 PHP56="$(which php-fpm5.6)"
 PHP70="$(which php-fpm7.0)"
 PHP72="$(which php-fpm7.2)"
+RECURSOR="$(which pdns_recursor)"
+POSTFIX="$(which postfix)"
+DOVECOT="$(which dovecot)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -139,13 +142,14 @@ function mysqlinfo {
   DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
   echo "Datenbanken: $DBS"
 }
-function nginxinfo {
-  STATUS="$(systemctl status nginx | awk '/Active:/ {print $2}')"
+function serviceinfo {
+  SERVICE="$(echo $SN | rev | cut -d'/' -f1 | rev)"
+  STATUS="$(systemctl status $SERVICE.service | awk '/Active:/ {print $2}')"
   if [[ "$STATUS" == "active" ]]
   then
-    echo -e "NGINX:\t\e[32m$STATUS\e[0m"
+    echo -e "$SERVICE:\t\e[32m$STATUS\e[0m"
   else
-    echo -e "NGINX:\t\e[31m$STATUS\e[0m"
+    echo -e "$SERVICE:\t\e[31m$STATUS\e[0m"
   fi
 }
 function phpinfo {
@@ -192,7 +196,8 @@ then
 fi
 if [ -n "$NGINX" ]
 then
-  nginxinfo
+  SN="$NGINX"
+  serviceinfo
 fi
 if [ -n "$PHP56" ]
 then
@@ -208,4 +213,19 @@ if [ -n "$PHP72" ]
 then
   PHP="$PHP72"
   phpinfo
+fi
+if [ -n "$RECURSOR" ]
+then
+  SN="/usr/sbin/pdns_recursor"
+  serviceinfo
+fi
+if [ -n "$POSTFIX" ]
+then
+  SN="$POSTFIX"
+  serviceinfo
+fi
+if [ -n "$DOVECOT" ]
+then
+  SN="$DOVECOT"
+  serviceinfo
 fi
