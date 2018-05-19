@@ -19,6 +19,9 @@ BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
 QM="$(which qm)"
 NGINX="$(which nginx)"
+PHP56="$(which php-fpm5.6)"
+PHP70="$(which php-fpm7.0)"
+PHP72="$(which php-fpm7.2)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -145,6 +148,16 @@ function nginxinfo {
     echo -e "NGINX:\t\e[31m$STATUS\e[0m"
   fi
 }
+function phpinfo {
+  VERSION="$(echo $PHP | rev | cut -d'/' -f1 | cut -d'm' -f1 | rev)"
+  STATUS="$(systemctl status php$VERSION-fpm.service | awk '/Active:/ {print $2}')"
+  if [[ "$STATUS" == "active" ]]
+  then
+    echo -e "PHP $VERSION:\t\e[32m$STATUS\e[0m"
+  else
+    echo -e "PHP $VERSION::\t\e[31m$STATUS\e[0m"
+  fi
+}
 
 
 # MAIN ROUTINE
@@ -180,4 +193,19 @@ fi
 if [ -n "$NGINX" ]
 then
   nginxinfo
+fi
+if [ -n "$PHP56" ]
+then
+  PHP="$PHP56"
+  phpinfo
+fi
+if [ -n "$PHP70" ]
+then
+  PHP="$PHP70"
+  phpinfo
+fi
+if [ -n "$PHP72" ]
+then
+  PHP="$PHP72"
+  phpinfo
 fi
