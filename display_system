@@ -75,15 +75,27 @@ function raidinfo {
     fi
   done
 }
-# Screen Info
+function proxmox {
+  QM="$(which qm)"
+  echo -e "\n===\tPROXMOX\t==="
+  for VM in $($QM list | awk '{if (NR!=1) {print $1}}')
+  do
+    NAME="$($QM config $VM | awk '/name:/ {print $2}')"
+    STATUS="$($QM status $VM | awk '{print $2}')"
+    if [ "$STATUS" == "running" ]
+    then
+      echo -e "\e[32m$VM $NAME ($STATUS)\e[0m"
+    else
+      echo -e "\e[31m$VM $NAME ($STATUS)\e[0m"
+    fi
+  done
+}
 function screeninfo {
   SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
 }
-# MySQL Info
 function mysqlinfo {
   MYSQLINFO=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
 }
-# BGP Infos
 function bgpinfo {
   BGPINFO=$(echo "IPv4:" && birdc sh p | grep "BGP" && echo "IPv6:" && birdc6 sh p | grep "BGP")
 }
@@ -97,6 +109,10 @@ partinfo
 if [ -n "$MDADM" ]
 then
   raidinfo
+fi
+if [ -n "$QM" ]
+then
+  proxmox
 fi
 echo -e "\n===\tMisc INFO\t==="
 screeninfo
