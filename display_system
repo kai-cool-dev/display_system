@@ -83,7 +83,6 @@ function raidinfo {
   done
 }
 function proxmox {
-  QM="$(which qm)"
   echo -e "\n===\tPROXMOX\t==="
   for VM in $($QM list | awk '{if (NR!=1) {print $1}}')
   do
@@ -99,7 +98,7 @@ function proxmox {
 }
 function varnish {
   echo -e "\n===\tVARNISH\t==="
-  varnishadm backend.list -p
+  $VARNISHADM backend.list -p
 }
 function screeninfo {
   SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
