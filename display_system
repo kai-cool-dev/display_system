@@ -102,7 +102,25 @@ function varnish {
 }
 function birdc {
   echo -e "\n===\tBGP IPv4\t==="
-
+  for PEER in $($BIRDC show protocol | awk '$2 ~ /BGP/ {print $1}')
+  do
+    STATE="$($BIRDC show protocols all $PEER | grep "BGP state:" | awk '{print $3}')"
+    ROUTES="$($BIRDC show protocols all $PEER | awk '/Routes:/' | cut -d ':' -f2 | xargs)"
+    AS="$($BIRDC show protocols all $PEER | awk '/AS:/ {print $3}')"
+    IP="$($BIRDC show protocols all $PEER | awk '/address/ && /Neighbor/ {print $3}')"
+    if [[ "$STATE" == "Established" ]]
+    then
+      echo -e "\e[32m$AS\t$IP\t$PEER ($STATE)\t$ROUTES\e[0m"
+    else
+      if [[ "$STATE" == "Down" ]]
+      then
+        echo -e "\e[33m$AS\t$IP\t$PEER ($STATE)\e[0m"
+      else
+        ERROR="$($BIRDC show protocols all $PEER | awk '/error:/' | cut -d':' -f2- | xargs)"
+        echo -e "\e[31m$AS\t$IP\t$PEER ($STATE)\t$ERROR\e[0m"
+      fi
+    fi
+  done
 }
 function screeninfo {
   SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
