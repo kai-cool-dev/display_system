@@ -1,39 +1,79 @@
 #!/bin/bash
-# CPU Infos
+# Created by Kai Pazdzewicz
+# Reworked a old script 19.05.2018
+
+# VARS
+CPUINFO="/proc/cpuinfo"
+RAMINFO="/proc/meminfo"
+LOAD="/proc/loadavg"
+DF="$(which df)"
+IP="$(which ip)"
+SCREEN="$(which screen)"
+MDADM="$(which mdadm)"
+MYSQL="$(which mysql)"
+BIRDC="$(which birdc)"
+BIRDC6="$(which birdc6)"
+VARNISHADM="$(which varnishadm)"
+QM="$(which qm)"
+
+# FUNCTIONS
 function cpuinfo {
-  CPUINFO=$(cat /proc/cpuinfo | grep "model name" | uniq -c | cut -d':' -f2|xargs)
-  MANUFACTURER=$(cat /proc/cpuinfo | grep "vendor_id" | uniq -c | cut -d':' -f2|xargs)
-  CORES=$(cat /proc/cpuinfo | grep "model name" | uniq -c | cut -d':' -f1 |xargs|cut -d' ' -f1)
-  SPEED=$(cat /proc/cpuinfo | grep "MHz" | xargs|cut -d':' -f2 | xargs)
-  LOAD=$(cat /proc/loadavg | awk '{ print $1,$2,$3}')
+  MANUFACTURER=$(cat "$CPUINFO" | grep "model name" | uniq | cut -d':' -f2 | cut -d'@' -f1 | xargs)
+  CORES=$(cat "$CPUINFO" | awk '/processor/' | wc -l)
+  SPEED=$(cat "$CPUINFO" | awk '/cpu MHz/' | cut -d':' -f2 | uniq | xargs | awk '{print int($1)}')
+  LOAD=$(cat "$LOAD" | awk '{ print $1,$2,$3}')
+  echo -e "===\tCPU INFO\t==="
+  echo "$MANUFACTURER ($CORES x $SPEED MHz)"
+  echo "Load: $LOAD"
 }
 # RAM Infos
 function raminfo {
-  TOTALRAM=$(expr $(cat /proc/meminfo | grep "MemTotal" | cut -d':' -f2 | xargs  | cut -d' ' -f1 | xargs) / 1024)
-  FREERAM=$(expr $(cat /proc/meminfo | grep "MemFree" | cut -d':' -f2  | xargs | cut -d' ' -f1 | xargs) / 1024)
+  TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
+  FREERAM=$(cat "$RAMINFO" | awk '/MemFree/ {print int($2/1024)}')
   USEDRAM=$(expr $TOTALRAM - $FREERAM)
+  echo -e "\n===\tRAM INFO\t==="
+  echo -e "$USEDRAM MB / $TOTALRAM MB"
 }
-# Partitionen
-function partinfo {
-  PARTITIONS=$(df -h | grep -v "tmpfs\|devtmpfs\|udev" | grep "/" | cut -d' ' -f1)
-  set -f
-  array=(${PARTITIONS// / })
-  for i in "${!array[@]}"
-  do
-    PERCENT=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f5)
-    USED=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f3)
-    GESAMT=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f2)
-    MOUNT=$(df -h | grep "${array[i]}" | xargs | cut -d' ' -f6)
-    echo -e "Partition \e[1m$MOUNT\e[0m ($PERCENT)  \t: $USED / $GESAMT"
-  done
-}
-# IP Info
 function ipinfo {
   IPS=$(ip -o addr | grep -v "127.0.0.1" | grep -v "::1/128" | grep -v "fe80::" | awk '{printf "%s\t\t\t%s\n",$2,$4}')
+  echo -e "\n===\tIPs INFO\t==="
+  echo "IP Adressen:"
+  echo "$IPS"
 }
-# RAID Info
+function partinfo {
+  echo -e "\n===\tHDD INFO\t==="
+  for MOUNT in $($DF| awk '{if (NR!=1) {print $6}}')
+  do
+    USED=$($DF -h | grep "$MOUNT$" | awk '{print $3}')
+    TOTAL=$($DF -h | grep "$MOUNT$" | awk '{print $2}')
+    PERC=$($DF | grep "$MOUNT$" | awk '{printf $5}' | cut -d'%' -f1)
+    if [ "$PERC" -gt "80" ]
+    then
+      if [ "$PERC" -gt "90" ]
+      then
+        echo -e "$USED\t/ $TOTAL\t\e[31m$PERC%\e[0m\t\e[1m$MOUNT\e[0m"
+      else
+        echo -e "$USED\t/ $TOTAL\t\e[33m$PERC%\e[0m\t\e[1m$MOUNT\e[0m"
+      fi
+    else
+      echo -e "$USED\t/ $TOTAL\t\e[32m$PERC%\e[0m\t\e[1m$MOUNT\e[0m"
+    fi
+  done
+}
 function raidinfo {
-  mdstat=$(cat /proc/mdstat)
+  echo -e "\n===\tRAID INFO\t==="
+  for MDEV in $($MDADM --examine --brief --scan  --config=partitions | awk '{print $2}')
+  do
+    RAIDSTATUS="$($MDADM --detail $MDEV | awk '$1 ~ /State/' | cut -d':' -f2 | xargs)"
+    TYPE="$($MDADM --detail $MDEV | grep "Raid Level" | cut -d':' -f2 | xargs)"
+    if [[ "$RAIDSTATUS" == *"degraded"* ]]
+    then
+      FAULTY="$(mdadm --detail $MDEV | awk '/faulty/ {printf("%s (%s)", $6,$5)}')"
+      echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: $FAULTY\e[0m"
+    else
+      echo -e "\e[32m$MDEV ($TYPE) - $RAIDSTATUS\e[0m"
+    fi
+  done
 }
 # Screen Info
 function screeninfo {
@@ -47,26 +87,16 @@ function mysqlinfo {
 function bgpinfo {
   BGPINFO=$(echo "IPv4:" && birdc sh p | grep "BGP" && echo "IPv6:" && birdc6 sh p | grep "BGP")
 }
-echo -e "===\tCPU INFO\t==="
+
+
+# MAIN ROUTINE
 cpuinfo
-echo "$CPUINFO ($MANUFACTURER)"
-echo "$CORES x $SPEED"
-echo "Load: $LOAD"
 raminfo
-echo -e "\n===\tRAM INFO\t==="
-echo "Used RAM / Total RAM"
-echo "$USEDRAM MB / $TOTALRAM MB"
 ipinfo
-echo -e "\n===\tIPs INFO\t==="
-echo "IP Adressen:"
-echo "$IPS"
-echo -e "\n===\tHDD INFO\t==="
 partinfo
-if [ -a "/proc/mdstat" ]
+if [ -n "$MDADM" ]
 then
   raidinfo
-  echo -e "\n===\tRAID INFO\t==="
-  echo "$mdstat"
 fi
 echo -e "\n===\tMisc INFO\t==="
 screeninfo
