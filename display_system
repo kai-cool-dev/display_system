@@ -46,7 +46,7 @@ function partinfo {
   do
     USED=$($DF -h | grep "$MOUNT$" | awk '{print $3}')
     TOTAL=$($DF -h | grep "$MOUNT$" | awk '{print $2}')
-    PERC=$($DF | grep "$MOUNT$" | awk '{printf $5}' | cut -d'%' -f1)
+    PERC=$($DF | grep "$MOUNT$" | awk '{print $5}' | cut -d'%' -f1)
     if [ "$PERC" -gt "80" ]
     then
       if [ "$PERC" -gt "90" ]
