@@ -10,6 +10,7 @@ DF="$(which df)"
 IP="$(which ip)"
 SCREEN="$(which screen)"
 MDADM="$(which mdadm)"
+MDSTAT="/proc/mdstat"
 MYSQL="$(which mysql)"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
@@ -70,6 +71,8 @@ function raidinfo {
     then
       if [[ "$RAIDSTATUS" == *"recovering"* ]]
       then
+        echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: \e[0m"
+        RECOVERY=$(cat $MDSTAT | awk '/recovery/')
       else
         FAULTY="$(mdadm --detail $MDEV | awk '/faulty/ {printf("%s (%s)", $6,$5)}')"
         echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: $FAULTY\e[0m"
