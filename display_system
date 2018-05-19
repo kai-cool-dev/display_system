@@ -71,8 +71,8 @@ function raidinfo {
     then
       if [[ "$RAIDSTATUS" == *"recovering"* ]]
       then
-        echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: \e[0m"
         RECOVERY=$(cat $MDSTAT | awk '/recovery/')
+        echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: $RECOVERY\e[0m"
       else
         FAULTY="$(mdadm --detail $MDEV | awk '/faulty/ {printf("%s (%s)", $6,$5)}')"
         echo -e "\e[31m$MDEV ($TYPE) - $RAIDSTATUS: $FAULTY\e[0m"
