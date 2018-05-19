@@ -23,6 +23,8 @@ PHP56="$(which php-fpm5.6)"
 PHP70="$(which php-fpm7.0)"
 PHP72="$(which php-fpm7.2)"
 RECURSOR="$(which pdns_recursor)"
+DNSD="$(which pdns_server)"
+DNSADM="$(which pdns_control)"
 POSTFIX="$(which postfix)"
 DOVECOT="$(which dovecot)"
 
@@ -162,6 +164,16 @@ function phpinfo {
     echo -e "PHP $VERSION::\t\e[31m$STATUS\e[0m"
   fi
 }
+function powerdns {
+  VERSION="$($DNSADM version)"
+  echo -e "\n===\tPOWERDNS $VERSION Info\t==="
+  ZONECOUNT="$($DNSADM list-zones | awk '/zonecount:/{print $2}' | cut -d':' -f2)"
+  echo -e "Zones:\t$ZONECOUNT"
+  UPTIME="$($DNSADM uptime)"
+  echo -e "Uptime:\t$UPTIME"
+  QUERIES="$($DNSADM ccounts)"
+  echo -e "$QUERIES"
+}
 
 
 # MAIN ROUTINE
@@ -188,6 +200,14 @@ fi
 if [ -n "$MYSQLD" ]
 then
   mysqlinfo
+  SN="$MYSQLD"
+  serviceinfo
+fi
+if [ -n "$DNSD" ]
+then
+  powerdns
+  SN="/usr/sbin/pdns"
+  serviceinfo
 fi
 echo -e "\n===\tMisc INFO\t==="
 if [ -n "$SCREEN" ]
@@ -216,7 +236,7 @@ then
 fi
 if [ -n "$RECURSOR" ]
 then
-  SN="/usr/sbin/pdns_recursor"
+  SN="/usr/sbin/pdns-recursor"
   serviceinfo
 fi
 if [ -n "$POSTFIX" ]
