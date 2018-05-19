@@ -11,7 +11,9 @@ IP="$(which ip)"
 SCREEN="$(which screen)"
 MDADM="$(which mdadm)"
 MDSTAT="/proc/mdstat"
+MYSQLADM="$(which mysqladmin)"
 MYSQL="$(which mysql)"
+MYSQLD="$(which mysqld)"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
@@ -123,10 +125,15 @@ function birdc {
   done
 }
 function screeninfo {
-  SCREENINFO=$(screen -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
+  SCREENINFO=$($SCREEN -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
+  echo -e "Screen Sessions:\t$SCREENINFO"
 }
 function mysqlinfo {
-  MYSQLINFO=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
+  echo -e "\n===\tMySQL Info\t==="
+  $MYSQLADM proc
+  $MYSQLADM status
+  DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
+  echo "Datenbanken: $DBS"
 }
 
 
@@ -151,11 +158,12 @@ if [ -n "$BIRDC" ]
 then
   birdc
 fi
-echo -e "\n===\tMisc INFO\t==="
-screeninfo
-echo -e "Screen Sessions:\t$SCREENINFO"
-if [ -x "$(command -v mysqld)" ];
+if [ -n "$MYSQLD" ]
 then
   mysqlinfo
-  echo -e "Datenbanken:\t$MYSQLINFO"
+fi
+echo -e "\n===\tMisc INFO\t==="
+if [ -n "$SCREEN" ]
+then
+  screeninfo
 fi
