@@ -6,6 +6,7 @@ Currently in developement but it runs productive on over 21 servers.
 
 ## Installation:
 
+git clone http://gitlab.fastnameserver.eu/server/display_system.git
 run install.sh
 
 ## Supported Services with Stats or similar:
