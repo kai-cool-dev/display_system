@@ -41,7 +41,6 @@ function cpuinfo {
   echo "$MANUFACTURER ($CORES x $SPEED MHz)"
   echo "Load: $LOAD"
 }
-# RAM Infos
 function raminfo {
   TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
   FREERAM=$(cat "$RAMINFO" | awk '/MemFree/ {print int($2/1024)}')
@@ -136,6 +135,28 @@ function birdc {
     fi
   done
 }
+function birdc6 {
+  echo -e "\n===\tBGP IPv6\t==="
+  for PEER in $($BIRDC6 show protocol | awk '$2 ~ /BGP/ {print $1}')
+  do
+    STATE="$($BIRDC6 show protocols all $PEER | grep "BGP state:" | awk '{print $3}')"
+    ROUTES="$($BIRDC6 show protocols all $PEER | awk '/Routes:/' | cut -d ':' -f2 | xargs)"
+    AS="$($BIRDC6 show protocols all $PEER | awk '/AS:/ {print $3}')"
+    IP="$($BIRDC6 show protocols all $PEER | awk '/address/ && /Neighbor/ {print $3}')"
+    if [[ "$STATE" == "Established" ]]
+    then
+      echo -e "\e[32m$AS\t$IP\t$PEER ($STATE)\t$ROUTES\e[0m"
+    else
+      if [[ "$STATE" == "Down" ]]
+      then
+        echo -e "\e[33m$AS\t$IP\t$PEER ($STATE)\e[0m"
+      else
+        ERROR="$($BIRDC6 show protocols all $PEER | awk '/error:/' | cut -d':' -f2- | xargs)"
+        echo -e "\e[31m$AS\t$IP\t$PEER ($STATE)\t$ERROR\e[0m"
+      fi
+    fi
+  done
+}
 function screeninfo {
   SCREENINFO=$($SCREEN -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
   echo -e "Screen Sessions:\t$SCREENINFO"
@@ -194,6 +215,13 @@ then
   if [ -f "$BIRDRUN" ]
   then
     birdc
+  fi
+fi
+if [ -n "$BIRDC6" ]
+then
+  if [ -f "$BIRD6RUN" ]
+  then
+    birdc6
   fi
 fi
 if [ -n "$MYSQLD" ]
