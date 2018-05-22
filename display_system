@@ -209,4 +209,8 @@ if [ -n "$SCREEN" ]
 then
   screeninfo
 fi
-serviceinfo
+
+if [ "$1" == "-services" ]
+then
+  serviceinfo
+fi
