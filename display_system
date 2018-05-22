@@ -15,9 +15,7 @@ MYSQLADM="$(which mysqladmin)"
 MYSQL="$(which mysql)"
 MYSQLD="$(which mysqld)"
 BIRDC="$(which birdc)"
-BIRDRUN="/var/run/bird/bird.ctl"
 BIRDC6="$(which birdc6)"
-BIRD6RUN="/var/run/bird/bird6.ctl"
 VARNISHADM="$(which varnishadm)"
 QM="$(which qm)"
 NGINX="$(which nginx)"
@@ -212,17 +210,11 @@ then
 fi
 if [ -n "$BIRDC" ]
 then
-  if [ -f "$BIRDRUN" ]
-  then
-    birdc
-  fi
+  birdc
 fi
 if [ -n "$BIRDC6" ]
 then
-  if [ -f "$BIRD6RUN" ]
-  then
-    birdc6
-  fi
+  birdc6
 fi
 if [ -n "$MYSQLD" ]
 then
