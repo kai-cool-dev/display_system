@@ -145,27 +145,20 @@ function mysqlinfo {
   $MYSQLADM proc
   $MYSQLADM status
   DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
-  echo "Datenbanken: $DBS"
+  echo -e "Databases:\t$DBS"
 }
 function serviceinfo {
-  SERVICE="$(echo $SN | rev | cut -d'/' -f1 | rev)"
-  STATUS="$(systemctl status $SERVICE.service | awk '/Active:/ {print $2}')"
-  if [[ "$STATUS" == "active" ]]
-  then
-    echo -e "$SERVICE:\t\e[32m$STATUS\e[0m"
-  else
-    echo -e "$SERVICE:\t\e[31m$STATUS\e[0m"
-  fi
-}
-function phpinfo {
-  VERSION="$(echo $PHP | rev | cut -d'/' -f1 | cut -d'm' -f1 | rev)"
-  STATUS="$(systemctl status php$VERSION-fpm.service | awk '/Active:/ {print $2}')"
-  if [[ "$STATUS" == "active" ]]
-  then
-    echo -e "PHP $VERSION:\t\e[32m$STATUS\e[0m"
-  else
-    echo -e "PHP $VERSION::\t\e[31m$STATUS\e[0m"
-  fi
+  echo -e "\n===\tSERVICES\t==="
+  for SERVICE in $(systemctl list-unit-files | awk '/\.service/ && /enabled/ {print $1}' | sed 's/\.service//g' | grep -v '@')
+  do
+    STATUS="$(systemctl status $SERVICE.service | awk '/Active:/ {print $2}')"
+    if [[ "$STATUS" == "active" ]]
+    then
+      echo -e "\e[32m$STATUS\e[0m:\t\t$SERVICE"
+    else
+      echo -e "\e[31m$STATUS\e[0m:\t$SERVICE"
+   fi
+  done
 }
 function powerdns {
   VERSION="$($DNSADM version)"
@@ -195,8 +188,6 @@ fi
 if [ -n "$VARNISHADM" ]
 then
   varnish
-  SN="/dummy/dummy/varnish"
-  serviceinfo
 fi
 if [ -n "$BIRDC" ]
 then
@@ -208,57 +199,14 @@ fi
 if [ -n "$MYSQLD" ]
 then
   mysqlinfo
-  SN="$MYSQLD"
-  serviceinfo
 fi
 if [ -n "$DNSD" ]
 then
   powerdns
-  SN="/usr/sbin/pdns"
-  serviceinfo
 fi
 echo -e "\n===\tMisc INFO\t==="
 if [ -n "$SCREEN" ]
 then
   screeninfo
 fi
-if [ -n "$NGINX" ]
-then
-  SN="$NGINX"
-  serviceinfo
-fi
-if [ -n "$PHP56" ]
-then
-  PHP="$PHP56"
-  phpinfo
-fi
-if [ -n "$PHP70" ]
-then
-  PHP="$PHP70"
-  phpinfo
-fi
-if [ -n "$PHP72" ]
-then
-  PHP="$PHP72"
-  phpinfo
-fi
-if [ -n "$RECURSOR" ]
-then
-  SN="/usr/sbin/pdns-recursor"
-  serviceinfo
-fi
-if [ -n "$POSTFIX" ]
-then
-  SN="$POSTFIX"
-  serviceinfo
-fi
-if [ -n "$DOVECOT" ]
-then
-  SN="$DOVECOT"
-  serviceinfo
-fi
-if [ -n "$NTOPNG" ]
-then
-  SN="$NTOPNG"
-  serviceinfo
-fi
+serviceinfo
