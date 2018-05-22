@@ -23,6 +23,10 @@ More Services coming soon
 
 ## Supported Services without stats:
 
+Please use trigger -services to show this!
+
+Otherwise the output is really heavy.
+
 1. NGINX
 2. PHP 5.6 - 7.2
 3. PowerDNS recursor
