@@ -14,6 +14,7 @@ MDSTAT="/proc/mdstat"
 MYSQLADM="$(which mysqladmin)"
 MYSQL="$(which mysql)"
 MYSQLD="$(which mysqld)"
+MYSQLSOCK="/var/run/mysqld/mysqld.sock"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
@@ -161,10 +162,15 @@ function screeninfo {
 }
 function mysqlinfo {
   echo -e "\n===\tMySQL Info\t==="
-  $MYSQLADM proc
-  $MYSQLADM status
-  DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
-  echo -e "Databases:\t$DBS"
+  if [ -f "$MYSQLSOCK" ]
+  then
+    $MYSQLADM proc
+    $MYSQLADM status
+    DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
+    echo -e "Databases:\t$DBS"
+  else
+    echo -e "\e[31mLocal MySQL is not running or reachable\e[0m"
+  fi
 }
 function serviceinfo {
   echo -e "\n===\tSERVICES\t==="
