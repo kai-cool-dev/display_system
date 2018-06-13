@@ -29,6 +29,7 @@ POSTFIX="$(which postfix)"
 DOVECOT="$(which dovecot)"
 NTOPNG="$(which ntopng)"
 NFSSTAT="$(which nfsstat)"
+UPTIME="$(which uptime)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -36,9 +37,11 @@ function cpuinfo {
   CORES=$(cat "$CPUINFO" | awk '/processor/' | wc -l)
   SPEED=$(cat "$CPUINFO" | awk '/cpu MHz/' | cut -d':' -f2 | uniq | xargs | awk '{print int($1)}')
   LOAD=$(cat "$LOAD" | awk '{ print $1,$2,$3}')
+  UPTIME=$($UPTIME | cut -d',' -f1,2)
   echo -e "===\tCPU INFO\t==="
-  echo "$MANUFACTURER ($CORES x $SPEED MHz)"
-  echo "Load: $LOAD"
+  echo -e "CPU:\t$MANUFACTURER($CORES x $SPEED MHz)"
+  echo -e "Load:\t$LOAD"
+  echo -e "Up:\t$UPTIME"
 }
 function raminfo {
   TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
@@ -157,6 +160,7 @@ function birdc6 {
   done
 }
 function screeninfo {
+  echo -e "\n===\tSCREEN INFO\t==="
   SCREENINFO=$($SCREEN -ls | grep "[0-9]." | grep -v "Socket" | wc -l)
   echo -e "Screen Sessions:\t$SCREENINFO"
 }
@@ -248,12 +252,10 @@ if [ -n "$NFSSTAT" ]
 then
   nfsstatistic
 fi
-echo -e "\n===\tMisc INFO\t==="
 if [ -n "$SCREEN" ]
 then
   screeninfo
 fi
-
 if [ "$1" == "-services" ]
 then
   serviceinfo
