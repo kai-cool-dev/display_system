@@ -4,6 +4,7 @@
 
 # VARS
 MAILLOG="/var/log/mail.log"
+TORRC="/etc/tor/torrc"
 
 ##### DO NOT EDIT BELOW THIS LINE #####
 CPUINFO="/proc/cpuinfo"
@@ -32,6 +33,7 @@ NFSSTAT="$(which nfsstat)"
 UPTIME="$(which uptime)"
 DOVECOT="$(which dovecot)"
 DOVEADM="$(which doveadm)"
+TOR="$(which tor)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -223,8 +225,31 @@ function dovecotinfo {
   echo -e "Mailbox-User:\t$MUSER"
   SIEVE="$($DOVEADM sieve list -u *@* | wc -l)"
   echo -e "Sieve-Filter:\t$SIEVE"
-  MAILS="$(cat $MAILLOG | grep "removed" | awk '{print $6}' | wc -l)"
-  echo -e "Todays Mails:\t$MAILS"
+  if [ -f "$MAILLOG" ]
+  then
+    MAILS="$(cat $MAILLOG | grep "removed" | awk '{print $6}' | wc -l)"
+    echo -e "Todays Mails:\t$MAILS"
+  else
+    echo -e "Maillog not found"
+  fi
+}
+
+function torinfo {
+  echo -e "\n===\tTOR INFO\t==="
+  if [ -f "$TORRC" ]
+  then
+    TORPORTS="$(cat $TORRC | grep "Port" | grep -v "HiddenServicePort" | awk '{print $2}' | xargs)"
+    echo -e "Listen:\t\t\t$TORPORTS"
+    SERVICE="Hidden Services:"
+    for HIDDENSERVICE in $(cat $TORRC | grep "HiddenServiceDir" | awk '{print $2}')
+    do
+      HOSTNAME="$(cat $HIDDENSERVICE/hostname)"
+      SERVICE="$SERVICE\t$HOSTNAME"
+    done
+    echo -e "$SERVICE"
+  else
+    echo -e "TORRC not found"
+  fi
 }
 
 # MAIN ROUTINE
@@ -271,6 +296,10 @@ fi
 if [ -n "$DOVECOT" ]
 then
   dovecotinfo
+fi
+if [ -n "$TOR" ]
+then
+  torinfo
 fi
 if [ "$1" == "-services" ]
 then

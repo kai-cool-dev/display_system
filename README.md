@@ -11,6 +11,10 @@ This piece of software is licensed under the Creative Commons Attribution-ShareA
 git clone http://gitlab.fastnameserver.eu/server/display_system.git
 run install.sh
 
+## Information:
+
+This script is meant to be used to be deployed automatically over ansible so it detects services automatically. None of the service is a requirement!
+
 ## Supported Services with Stats or similar:
 
 
@@ -23,6 +27,7 @@ run install.sh
 7. NFS: Shows active connections and lists these
 8. Proxmox: Shows status of created VMs
 9. Dovecot: Shows count of mailbox-user, sieve-filter and todays mails through mail.log (please edit display_system if you don't use /var/log/mail.log and please setup logrotate! currently not supported with any other logging!)
+10. TOR: Shows ports and hidden service domains (please edit display_system if you don't use /etc/tor/torrc as your configfile)
 
 More Services coming soon
 
