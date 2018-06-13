@@ -22,6 +22,7 @@ run install.sh
 6. MDADM: Shows RAID informations. If raid is faulty also the faulty disk, recovery stat, etc
 7. NFS: Shows active connections and lists these
 8. Proxmox: Shows status of created VMs
+9. Dovecot: Shows count of mailbox-user, sieve-filter and todays mails through mail.log (please edit display_system if you don't use /var/log/mail.log and please setup logrotate! currently not supported with any other logging!)
 
 More Services coming soon
 
