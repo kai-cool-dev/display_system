@@ -3,6 +3,9 @@
 # Reworked a old script 19.05.2018
 
 # VARS
+MAILLOG="/var/log/mail.log"
+
+##### DO NOT EDIT BELOW THIS LINE #####
 CPUINFO="/proc/cpuinfo"
 RAMINFO="/proc/meminfo"
 LOAD="/proc/loadavg"
@@ -27,6 +30,8 @@ DNSD="$(which pdns_server)"
 DNSADM="$(which pdns_control)"
 NFSSTAT="$(which nfsstat)"
 UPTIME="$(which uptime)"
+DOVECOT="$(which dovecot)"
+DOVEADM="$(which doveadm)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -212,6 +217,16 @@ function nfsstatistic {
   fi
 }
 
+function dovecotinfo {
+  echo -e "\n===\tDOVECOT INFO\t==="
+  MUSER="$($DOVEADM user *@* | wc -l)"
+  echo -e "Mailbox-User:\t$MUSER"
+  SIEVE="$($DOVEADM sieve list -u *@* | wc -l)"
+  echo -e "Sieve-Filter:\t$SIEVE"
+  MAILS="$(cat $MAILLOG | grep \"removed\" | awk '{print $6}' | wc -l)"
+  echo -e "Todays Mails:\t$MAILS"
+}
+
 # MAIN ROUTINE
 cpuinfo
 raminfo
@@ -252,6 +267,10 @@ fi
 if [ -n "$SCREEN" ]
 then
   screeninfo
+fi
+if [ -n "$DOVECOT" ]
+then
+  dovecotinfo
 fi
 if [ "$1" == "-services" ]
 then
