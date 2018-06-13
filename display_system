@@ -223,7 +223,7 @@ function dovecotinfo {
   echo -e "Mailbox-User:\t$MUSER"
   SIEVE="$($DOVEADM sieve list -u *@* | wc -l)"
   echo -e "Sieve-Filter:\t$SIEVE"
-  MAILS="$(cat $MAILLOG | grep \"removed\" | awk '{print $6}' | wc -l)"
+  MAILS="$(cat $MAILLOG | grep "removed" | awk '{print $6}' | wc -l)"
   echo -e "Todays Mails:\t$MAILS"
 }
 
