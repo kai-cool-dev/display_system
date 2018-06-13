@@ -4,6 +4,8 @@ This script shows all system data and some nice and neat little stats from your 
 
 Currently in developement but it runs productive on over 21 servers.
 
+This piece of software is licensed under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) more information here: https://creativecommons.org/licenses/by-sa/4.0/
+
 ## Installation:
 
 git clone http://gitlab.fastnameserver.eu/server/display_system.git
@@ -18,20 +20,11 @@ run install.sh
 4. Bird: Shows connected BGP peers with routing details and ASN + Endpoint
 5. PowerDNS authorative: Shows count of zones, Uptime of DNS Server and some query stats
 6. MDADM: Shows RAID informations. If raid is faulty also the faulty disk, recovery stat, etc
+7. NFS: Shows active connections and lists these
+8. Proxmox: Shows status of created VMs
 
 More Services coming soon
 
-## Supported Services without stats:
+## See status of active systemd deamons:
 
 Please use trigger -services to show this!
-
-Otherwise the output is really heavy.
-
-1. NGINX
-2. PHP 5.6 - 7.2
-3. PowerDNS recursor
-4. Postfix
-5. Dovecot
-6. NTOPNG
-
-More Services coming soon 

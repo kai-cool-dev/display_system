@@ -28,6 +28,7 @@ DNSADM="$(which pdns_control)"
 POSTFIX="$(which postfix)"
 DOVECOT="$(which dovecot)"
 NTOPNG="$(which ntopng)"
+NFSSTAT="$(which nfsstat)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -190,6 +191,25 @@ function powerdns {
   echo -e "$QUERIES"
 }
 
+function nfsstatistic {
+  echo -e "\n===\tNFS INFO\t==="
+  CONNECTIONS=$(ss -m | awk '/nfs/ {print $6}')
+  if [[ "$CONNECTIONS" == "" ]]
+  then
+    echo -e "Connections:\t0"
+  else
+    echo -e "Connections:\t$(echo "$CONNECTIONS" | wc -l)"
+    EXPORTS="/etc/exports"
+    if [ -f "$EXPORTS" ]
+    then
+      echo -e "Clients:\t"$CONNECTIONS
+      EXPORTS=$(cat "$EXPORTS" | grep -v '#' | awk '{print $1}' | wc -l)
+      echo -e "Exports:\t\t$EXPORTS"
+    else
+      echo -e "Server:\t\t"$CONNECTIONS
+    fi
+  fi
+}
 
 # MAIN ROUTINE
 cpuinfo
@@ -223,6 +243,10 @@ fi
 if [ -n "$DNSD" ]
 then
   powerdns
+fi
+if [ -n "$NFSSTAT" ]
+then
+  nfsstatistic
 fi
 echo -e "\n===\tMisc INFO\t==="
 if [ -n "$SCREEN" ]
