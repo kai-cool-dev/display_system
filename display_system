@@ -34,6 +34,7 @@ UPTIME="$(which uptime)"
 DOVECOT="$(which dovecot)"
 DOVEADM="$(which doveadm)"
 TOR="$(which tor)"
+DOCKER="$(which docker)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -252,6 +253,19 @@ function torinfo {
   fi
 }
 
+function dockerinfo {
+  echo -e "\n===\tDOCKER INFO\t==="
+  echo -e "NAME\tCPU\tRAM"
+  for CONTAINER in $($DOCKER container ls | awk '{if (NR!=1) {print $1}}');
+  do
+    STATUS=$($DOCKER stats $CONTAINER --no-stream | awk '{if (NR!=1) {print}}')
+    NAME=$(echo $STATUS | awk '{print $2}')
+    CPU=$(echo $STATUS | awk '{print $3}')
+    RAM=$(echo $STATUS | awk '{print $7}')
+    echo -e "$NAME\t$CPU\t$RAM"
+  done
+}
+
 # MAIN ROUTINE
 cpuinfo
 raminfo
@@ -300,6 +314,10 @@ fi
 if [ -n "$TOR" ]
 then
   torinfo
+fi
+if [ -n "$DOCKER" ]
+then
+  dockerinfo
 fi
 if [ "$1" == "-services" ]
 then
