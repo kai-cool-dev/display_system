@@ -255,14 +255,14 @@ function torinfo {
 
 function dockerinfo {
   echo -e "\n===\tDOCKER INFO\t==="
-  echo -e "NAME\tCPU\tRAM"
+  echo -e "CPU\tRAM\tNAME"
   for CONTAINER in $($DOCKER container ls | awk '{if (NR!=1) {print $1}}');
   do
     STATUS=$($DOCKER stats $CONTAINER --no-stream | awk '{if (NR!=1) {print}}')
     NAME=$(echo $STATUS | awk '{print $2}')
     CPU=$(echo $STATUS | awk '{print $3}')
     RAM=$(echo $STATUS | awk '{print $7}')
-    echo -e "$NAME\t$CPU\t$RAM"
+    echo -e "$CPU\t$RAM\t$NAME"
   done
 }
 
