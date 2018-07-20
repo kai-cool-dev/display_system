@@ -182,7 +182,7 @@ function serviceinfo {
   do
     STATUS="$(systemctl status $SERVICE.service | awk '/Active:/ {print $2}')"
     if [[ "$STATUS" == "active" ]]
-    then
+     then
       echo -e "\e[32m$STATUS\e[0m:\t\t$SERVICE"
     else
       echo -e "\e[31m$STATUS\e[0m:\t$SERVICE"
@@ -244,8 +244,11 @@ function torinfo {
     SERVICE="Hidden Services:"
     for HIDDENSERVICE in $(cat $TORRC | grep "HiddenServiceDir" | awk '{print $2}')
     do
-      HOSTNAME="$(cat $HIDDENSERVICE/hostname)"
-      SERVICE="$SERVICE\t$HOSTNAME"
+      if [ -r "$HIDDENSERVICE/hostname" ]
+      then
+        HOSTNAME="$(cat $HIDDENSERVICE/hostname)"
+        SERVICE="$SERVICE\t$HOSTNAME"
+      fi
     done
     echo -e "$SERVICE"
   else
