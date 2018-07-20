@@ -8,7 +8,6 @@ Currently in developement but it runs productive on over 21 servers.
 
 ```
 git clone http://gitlab.fastnameserver.eu/server/display_system.git
-
 ./install.sh
 ```
 
@@ -16,7 +15,6 @@ git clone http://gitlab.fastnameserver.eu/server/display_system.git
 
 ```
 git pull
-
 ./install.sh
 ```
 
