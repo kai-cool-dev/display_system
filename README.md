@@ -4,12 +4,21 @@ This script shows all system data and some nice and neat little stats from your 
 
 Currently in developement but it runs productive on over 21 servers.
 
-This piece of software is licensed under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) more information here: https://creativecommons.org/licenses/by-sa/4.0/
-
 ## Installation:
 
+```
 git clone http://gitlab.fastnameserver.eu/server/display_system.git
-run install.sh
+
+./install.sh
+```
+
+## Update
+
+```
+git pull
+
+./install.sh
+```
 
 ## Information:
 
