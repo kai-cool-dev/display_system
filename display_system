@@ -200,7 +200,7 @@ function screeninfo {
 }
 function mysqlinfo {
   echo -e "\n===\tMySQL Info\t==="
-  if [ -f $MYSQLSOCK ]
+  if [ -e $MYSQLSOCK ]
   then
     $MYSQLADM proc
     $MYSQLADM status
