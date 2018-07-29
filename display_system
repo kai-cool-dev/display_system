@@ -6,8 +6,6 @@
 MAILLOG="/var/log/mail.log"
 TORRC="/etc/tor/torrc"
 MYSQLSOCK="/var/run/mysqld/mysqld.sock"
-BIRDCTL="/run/bird/bird.ctl"
-BIRD6CTL="/run/bird/bird6.ctl"
 
 ##### DO NOT EDIT BELOW THIS LINE #####
 CPUINFO="/proc/cpuinfo"
@@ -24,6 +22,9 @@ MYSQLD="$(which mysqld)"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
+VARNISHADMCTL="/var/lib/varnish/utility/_.vsm"
+BIRDCTL="/run/bird/bird.ctl"
+BIRD6CTL="/run/bird/bird6.ctl"
 QM="$(which qm)"
 NGINX="$(which nginx)"
 PHP56="$(which php-fpm5.6)"
@@ -121,7 +122,12 @@ function proxmox {
 }
 function varnish {
   echo -e "\n===\tVARNISH\t==="
-  $VARNISHADM backend.list -p
+  if [ -e $VARNISHADMCTL ]
+  then
+    $VARNISHADM backend.list -p
+  else
+    echo -e "No permissions to access varnishadm"
+  fi
 }
 function birdc {
   echo -e "\n===\tBGP IPv4\t==="
