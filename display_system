@@ -5,6 +5,9 @@
 # VARS
 MAILLOG="/var/log/mail.log"
 TORRC="/etc/tor/torrc"
+MYSQLSOCK="/var/run/mysqld/mysqld.sock"
+BIRDCTL="/run/bird/bird.ctl"
+BIRD6CTL="/run/bird/bird6.ctl"
 
 ##### DO NOT EDIT BELOW THIS LINE #####
 CPUINFO="/proc/cpuinfo"
@@ -122,47 +125,57 @@ function varnish {
 }
 function birdc {
   echo -e "\n===\tBGP IPv4\t==="
-  for PEER in $($BIRDC show protocol | awk '$2 ~ /BGP/ {print $1}')
-  do
-    STATE="$($BIRDC show protocols all $PEER | grep "BGP state:" | awk '{print $3}')"
-    ROUTES="$($BIRDC show protocols all $PEER | awk '/Routes:/' | cut -d ':' -f2 | xargs)"
-    AS="$($BIRDC show protocols all $PEER | awk '/AS:/ {print $3}')"
-    IP="$($BIRDC show protocols all $PEER | awk '/address/ && /Neighbor/ {print $3}')"
-    if [[ "$STATE" == "Established" ]]
-    then
-      echo -e "\e[32m$AS\t$IP\t$PEER ($STATE)\t$ROUTES\e[0m"
-    else
-      if [[ "$STATE" == "Down" ]]
+  if [ -e $BIRDCTL ]
+  then
+    for PEER in $($BIRDC show protocol | awk '$2 ~ /BGP/ {print $1}')
+    do
+      STATE="$($BIRDC show protocols all $PEER | grep "BGP state:" | awk '{print $3}')"
+      ROUTES="$($BIRDC show protocols all $PEER | awk '/Routes:/' | cut -d ':' -f2 | xargs)"
+      AS="$($BIRDC show protocols all $PEER | awk '/AS:/ {print $3}')"
+      IP="$($BIRDC show protocols all $PEER | awk '/address/ && /Neighbor/ {print $3}')"
+      if [[ "$STATE" == "Established" ]]
       then
-        echo -e "\e[33m$AS\t$IP\t$PEER ($STATE)\e[0m"
+        echo -e "\e[32m$AS\t$IP\t$PEER ($STATE)\t$ROUTES\e[0m"
       else
-        ERROR="$($BIRDC show protocols all $PEER | awk '/error:/' | cut -d':' -f2- | xargs)"
-        echo -e "\e[31m$AS\t$IP\t$PEER ($STATE)\t$ERROR\e[0m"
+        if [[ "$STATE" == "Down" ]]
+        then
+          echo -e "\e[33m$AS\t$IP\t$PEER ($STATE)\e[0m"
+        else
+          ERROR="$($BIRDC show protocols all $PEER | awk '/error:/' | cut -d':' -f2- | xargs)"
+          echo -e "\e[31m$AS\t$IP\t$PEER ($STATE)\t$ERROR\e[0m"
+        fi
       fi
-    fi
-  done
+    done
+  else
+    echo -e "Local Bird not running"
+  fi
 }
 function birdc6 {
   echo -e "\n===\tBGP IPv6\t==="
-  for PEER in $($BIRDC6 show protocol | awk '$2 ~ /BGP/ {print $1}')
-  do
-    STATE="$($BIRDC6 show protocols all $PEER | grep "BGP state:" | awk '{print $3}')"
-    ROUTES="$($BIRDC6 show protocols all $PEER | awk '/Routes:/' | cut -d ':' -f2 | xargs)"
-    AS="$($BIRDC6 show protocols all $PEER | awk '/AS:/ {print $3}')"
-    IP="$($BIRDC6 show protocols all $PEER | awk '/address/ && /Neighbor/ {print $3}')"
-    if [[ "$STATE" == "Established" ]]
-    then
-      echo -e "\e[32m$AS\t$IP\t$PEER ($STATE)\t$ROUTES\e[0m"
-    else
-      if [[ "$STATE" == "Down" ]]
+  if [ -e $BIRD6CTL ]
+  then
+    for PEER in $($BIRDC6 show protocol | awk '$2 ~ /BGP/ {print $1}')
+    do
+      STATE="$($BIRDC6 show protocols all $PEER | grep "BGP state:" | awk '{print $3}')"
+      ROUTES="$($BIRDC6 show protocols all $PEER | awk '/Routes:/' | cut -d ':' -f2 | xargs)"
+      AS="$($BIRDC6 show protocols all $PEER | awk '/AS:/ {print $3}')"
+      IP="$($BIRDC6 show protocols all $PEER | awk '/address/ && /Neighbor/ {print $3}')"
+      if [[ "$STATE" == "Established" ]]
       then
-        echo -e "\e[33m$AS\t$IP\t$PEER ($STATE)\e[0m"
+        echo -e "\e[32m$AS\t$IP\t$PEER ($STATE)\t$ROUTES\e[0m"
       else
-        ERROR="$($BIRDC6 show protocols all $PEER | awk '/error:/' | cut -d':' -f2- | xargs)"
-        echo -e "\e[31m$AS\t$IP\t$PEER ($STATE)\t$ERROR\e[0m"
+        if [[ "$STATE" == "Down" ]]
+        then
+          echo -e "\e[33m$AS\t$IP\t$PEER ($STATE)\e[0m"
+        else
+          ERROR="$($BIRDC6 show protocols all $PEER | awk '/error:/' | cut -d':' -f2- | xargs)"
+          echo -e "\e[31m$AS\t$IP\t$PEER ($STATE)\t$ERROR\e[0m"
+        fi
       fi
-    fi
-  done
+    done
+  else
+    echo -e "Local Bird6 not running"
+  fi
 }
 function screeninfo {
   echo -e "\n===\tSCREEN INFO\t==="
@@ -171,10 +184,15 @@ function screeninfo {
 }
 function mysqlinfo {
   echo -e "\n===\tMySQL Info\t==="
-  $MYSQLADM proc
-  $MYSQLADM status
-  DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
-  echo -e "Databases:\t$DBS"
+  if [ -f $MYSQLSOCK ]
+  then
+    $MYSQLADM proc
+    $MYSQLADM status
+    DBS=$(mysql -u root -e "show databases;" | grep -v "Database" | wc -l)
+    echo -e "Databases:\t$DBS"
+  else
+    echo -e "Local MySQL Server not running"
+  fi
 }
 function serviceinfo {
   echo -e "\n===\tSERVICES\t==="
