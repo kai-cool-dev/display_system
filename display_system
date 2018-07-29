@@ -39,6 +39,7 @@ DOVECOT="$(which dovecot)"
 DOVEADM="$(which doveadm)"
 TOR="$(which tor)"
 DOCKER="$(which docker)"
+DOCKERSOCK="/var/run/docker.sock"
 WHO="$(which who)"
 
 # FUNCTIONS
@@ -289,14 +290,19 @@ function torinfo {
 
 function dockerinfo {
   echo -e "\n===\tDOCKER INFO\t==="
-  echo -e "CPU\tRAM\tNAME"
-  for CONTAINER in $($DOCKER container ls | awk '{if (NR!=1) {print $1}}');
-  do
-    STATUS=$($DOCKER stats $CONTAINER --no-stream | awk '{if (NR!=1) {print}}')
-    NAME=$(echo $STATUS | awk '{print $2}')
-    CPU=$(echo $STATUS | awk '{print $3}')
-    RAM=$(echo $STATUS | awk '{print $7}')
-    echo -e "$CPU\t$RAM\t$NAME"
+  if [ -e $DOCKERSOCK ]
+  then
+    echo -e "CPU\tRAM\tNAME"
+    for CONTAINER in $($DOCKER container ls | awk '{if (NR!=1) {print $1}}');
+    do
+      STATUS=$($DOCKER stats $CONTAINER --no-stream | awk '{if (NR!=1) {print}}')
+      NAME=$(echo $STATUS | awk '{print $2}')
+      CPU=$(echo $STATUS | awk '{print $3}')
+      RAM=$(echo $STATUS | awk '{print $7}')
+      echo -e "$CPU\t$RAM\t$NAME"
+    done
+  else
+    echo -e "No Permissions to access docker"
   done
 }
 
