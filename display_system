@@ -53,7 +53,7 @@ function cpuinfo {
   echo -e "CPU:\t$MANUFACTURER ($CORES x $SPEED MHz)"
   echo -e "Load:\t$LOAD"
   echo -e "Up:\t$UPTIME"
-  echo -e "Users:\t$USER"
+  echo -e "Users:\n$USER"
 }
 function raminfo {
   TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
