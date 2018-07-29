@@ -331,7 +331,7 @@ function nginxinfo {
     then
       NAME="default"
     fi
-    echo -e "$NAME (Ports: $LISTEN)"
+    echo -e "$NAME ($LISTEN)"
   done
 }
 
