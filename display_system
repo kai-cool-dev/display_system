@@ -47,7 +47,7 @@ function cpuinfo {
   CORES=$(cat "$CPUINFO" | awk '/processor/' | wc -l)
   SPEED=$(cat "$CPUINFO" | awk '/cpu MHz/' | cut -d':' -f2 | uniq | xargs | awk '{print int($1)}')
   LOAD=$(cat "$LOAD" | awk '{ print $1,$2,$3}')
-  UPTIME=$($UPTIME | cut -d',' -f1 | awk '{print $3}')
+  UPTIME=$($UPTIME | cut -d',' -f1 | awk '{print $3,$4}')
   USER=$($WHO | awk '{print $1}')
   echo -e "===\tCPU INFO\t==="
   echo -e "CPU:\t$MANUFACTURER ($CORES x $SPEED MHz)"
