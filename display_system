@@ -327,10 +327,6 @@ function nginxinfo {
   do
     LISTEN="$(cat $NGINXCONF/$CONF | grep "listen" | sed 's/;//g' | awk '{print $2}' | xargs)"
     NAME="$(cat $NGINXCONF/$CONF | grep "server_name" | sed 's/;//g' | awk '{print $2}' | sort | uniq | xargs)"
-    if [[ $NAME == "_" ]]
-    then
-      NAME="default"
-    fi
     echo -e "$NAME ($LISTEN)"
   done
 }
