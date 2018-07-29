@@ -57,8 +57,8 @@ function cpuinfo {
   for USER in $USERS
   do
     DUSER="$DUSER$USER "
-    echo -e "$DUSER"
   done
+  echo -e "$DUSER"
 }
 function raminfo {
   TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
