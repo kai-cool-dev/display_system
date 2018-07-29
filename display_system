@@ -48,12 +48,17 @@ function cpuinfo {
   SPEED=$(cat "$CPUINFO" | awk '/cpu MHz/' | cut -d':' -f2 | uniq | xargs | awk '{print int($1)}')
   LOAD=$(cat "$LOAD" | awk '{ print $1,$2,$3}')
   UPTIME=$($UPTIME | cut -d',' -f1 | awk '{print $3,$4}')
-  USER=$($WHO | awk '{print $1}')
+  USERS=$($WHO | awk '{print $1}')
   echo -e "===\tCPU INFO\t==="
   echo -e "CPU:\t$MANUFACTURER ($CORES x $SPEED MHz)"
   echo -e "Load:\t$LOAD"
   echo -e "Up:\t$UPTIME"
-  echo -e "Users:\n$USER"
+  DUSER="Users:\t"
+  for USER in $USERS
+  do
+    DUSER="$DUSER$USER "
+    echo -e "$DUSER"
+  done
 }
 function raminfo {
   TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
