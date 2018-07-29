@@ -6,6 +6,15 @@ Currently in developement but it runs productive on over 21 servers.
 
 ## Installation:
 
+Stable Release:
+
+```
+git clone https://github.com/kai-cool-dev/display_system.git
+./install.sh
+```
+
+Nightly/Dev Release:
+
 ```
 git clone http://gitlab.fastnameserver.eu/server/display_system.git
 ./install.sh
@@ -42,4 +51,6 @@ More Services coming soon
 
 ## See status of active systemd deamons:
 
-Please use trigger -services to show this!
+Please run the programm with trigger -services to show this!
+
+`display_system -services`
