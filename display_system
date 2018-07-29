@@ -39,6 +39,7 @@ DOVECOT="$(which dovecot)"
 DOVEADM="$(which doveadm)"
 TOR="$(which tor)"
 DOCKER="$(which docker)"
+WHO="$(which who)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -46,11 +47,13 @@ function cpuinfo {
   CORES=$(cat "$CPUINFO" | awk '/processor/' | wc -l)
   SPEED=$(cat "$CPUINFO" | awk '/cpu MHz/' | cut -d':' -f2 | uniq | xargs | awk '{print int($1)}')
   LOAD=$(cat "$LOAD" | awk '{ print $1,$2,$3}')
-  UPTIME=$($UPTIME | cut -d',' -f1,2)
+  UPTIME=$($UPTIME | cut -d',' -f1 | awk '{print $3}')
+  USER=$($WHO | awk '{print $1}')
   echo -e "===\tCPU INFO\t==="
-  echo -e "CPU:\t$MANUFACTURER($CORES x $SPEED MHz)"
+  echo -e "CPU:\t$MANUFACTURER ($CORES x $SPEED MHz)"
   echo -e "Load:\t$LOAD"
   echo -e "Up:\t$UPTIME"
+  echo -e "Users:\t$USER"
 }
 function raminfo {
   TOTALRAM=$(cat "$RAMINFO" | awk '/MemTotal/ {print int($2/1024)}')
@@ -62,7 +65,6 @@ function raminfo {
 function ipinfo {
   IPS=$(ip -o addr | grep -v "127.0.0.1" | grep -v "::1/128" | grep -v "fe80::" | awk '{printf "%s\t\t\t%s\n",$2,$4}')
   echo -e "\n===\tIPs INFO\t==="
-  echo "IP Adressen:"
   echo "$IPS"
 }
 function partinfo {
@@ -293,6 +295,18 @@ function dockerinfo {
   done
 }
 
+function phpinfo {
+  echo -e "\n===\t$PHP INFO\t==="
+  ACTIVE="$(systemctl status $PHP | grep "Active" | cut -d':' -f2 | awk '{print $1}')"
+  if [[ $ACTIVE == "active" ]]
+  then
+    STATUS="$(systemctl status $PHP | grep "Status" | cut -d'"' -f2 | awk '{print}')"
+    echo -e "Status:\t$STATUS"
+  else
+    echo -e "$PHP is inactive/stopped"
+  fi
+}
+
 # MAIN ROUTINE
 cpuinfo
 raminfo
@@ -350,3 +364,7 @@ if [ "$1" == "-services" ]
 then
   serviceinfo
 fi
+for PHP in $(systemctl list-unit-files | grep -P "php.*-fpm" | sed 's/.service//g'| awk '{print $1}')
+do
+  phpinfo
+done
