@@ -6,6 +6,7 @@
 MAILLOG="/var/log/mail.log"
 TORRC="/etc/tor/torrc"
 MYSQLSOCK="/var/run/mysqld/mysqld.sock"
+NGINXCONF="/etc/nginx/conf.d/"
 
 ##### DO NOT EDIT BELOW THIS LINE #####
 CPUINFO="/proc/cpuinfo"
@@ -41,6 +42,7 @@ TOR="$(which tor)"
 DOCKER="$(which docker)"
 DOCKERSOCK="/var/run/docker.sock"
 WHO="$(which who)"
+NGINX="$(which nginx)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -303,7 +305,7 @@ function dockerinfo {
     done
   else
     echo -e "No Permissions to access docker"
-  done
+  fi
 }
 
 function phpinfo {
@@ -316,6 +318,17 @@ function phpinfo {
   else
     echo -e "$PHP is inactive/stopped"
   fi
+}
+
+function nginxinfo {
+  echo -e "\n===\tNGINX INFO\t==="
+  echo -e "VHosts:"
+  for CONF in $(ls $NGINXCONF)
+  do
+    LISTEN="$(cat $NGINXCONF/$CONF | grep "listen" | sed 's/;//g' | awk '{print $2}' | xargs)"
+    NAME="$(cat $NGINXCONF/$CONF | grep "server_name" | sed 's/;//g' | awk '{print $2}' | sort | uniq | xargs)"
+    echo -e "$NAME (Ports: $LISTEN)"
+  done
 }
 
 # MAIN ROUTINE
@@ -370,6 +383,10 @@ fi
 if [ -n "$DOCKER" ]
 then
   dockerinfo
+fi
+if [ -n "$NGINX" ]
+then
+  nginxinfo
 fi
 if [ "$1" == "-services" ]
 then
