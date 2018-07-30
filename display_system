@@ -316,7 +316,7 @@ function phpinfo {
     STATUS="$(systemctl status $PHP | grep "Status" | cut -d'"' -f2 | awk '{print}')"
     echo -e "Status:\t$STATUS"
     PID="$(systemctl status $PHP | grep "Main PID:" | cut -d':' -f2 | awk '{print $1}')"
-    LISTEN="$(ss -tulpen | grep "$PID" | awk '{print $5}')"
+    LISTEN="$(ss -tulpen | grep "pid=$PID," | awk '{print $5}')"
     if [[ ! -z $LISTEN ]]
     then
       echo -e "Listen:\t$LISTEN"
