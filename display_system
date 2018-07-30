@@ -315,6 +315,12 @@ function phpinfo {
   then
     STATUS="$(systemctl status $PHP | grep "Status" | cut -d'"' -f2 | awk '{print}')"
     echo -e "Status:\t$STATUS"
+    PID="$(systemctl status $PHP | grep "Main PID:" | cut -d':' -f2 | awk '{print $1}')"
+    LISTEN="$(ss -tulpen | grep "$PID" | awk '{print $5}')"
+    if [[ ! -z $LISTEN ]]
+    then
+      echo -e "Listen:\t$LISTEN"
+    fi
   else
     echo -e "$PHP is inactive/stopped"
   fi
@@ -323,10 +329,10 @@ function phpinfo {
 function nginxinfo {
   echo -e "\n===\tNGINX INFO\t==="
   echo -e "VHosts:"
-  for CONF in $(ls $NGINXCONF)
+  for CONF in $(find $NGINXCONF -iname "*.conf")
   do
-    LISTEN="$(cat $NGINXCONF/$CONF | grep "listen" | sed 's/;//g' | awk '{print $2}' | xargs)"
-    NAME="$(cat $NGINXCONF/$CONF | grep "server_name" | sed 's/;//g' | awk '{print $2}' | sort | uniq | xargs)"
+    LISTEN="$(cat $CONF | grep "listen" | sed 's/;//g' | awk '{print $2}' | xargs)"
+    NAME="$(cat $CONF | grep "server_name" | sed 's/;//g' | awk '{print $2}' | sort | uniq | xargs)"
     echo -e "$NAME ($LISTEN)"
   done
 }
