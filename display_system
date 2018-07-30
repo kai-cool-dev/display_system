@@ -333,7 +333,7 @@ function nginxinfo {
   do
     LISTEN="$(cat $CONF | grep "listen" | sed 's/;//g' | awk '{print $2}' | xargs)"
     NAME="$(cat $CONF | grep "server_name" | sed 's/;//g' | awk '{print $2}' | sort | uniq | xargs)"
-    echo -e "$NAME ($LISTEN)"
+    echo -e "-\t$NAME ($LISTEN)"
   done
 }
 
