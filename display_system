@@ -132,7 +132,7 @@ function proxmox {
 }
 function varnish {
   echo -e "\n===\tVARNISH\t==="
-  if [ -e $VARNISHADMCTL ]
+  if [ -r $VARNISHADMCTL ]
   then
     $VARNISHADM backend.list -p
   else
