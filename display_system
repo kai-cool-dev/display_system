@@ -43,6 +43,7 @@ DOCKER="$(which docker)"
 DOCKERSOCK="/var/run/docker.sock"
 WHO="$(which who)"
 NGINX="$(which nginx)"
+REDIS_CLI="$(which redis-cli)"
 
 # FUNCTIONS
 function cpuinfo {
@@ -72,7 +73,7 @@ function raminfo {
 }
 function ipinfo {
   IPS=$(ip -o addr | grep -v "127.0.0.1" | grep -v "::1/128" | grep -v "fe80::" | awk '{printf "%s\t\t\t%s\n",$2,$4}')
-  echo -e "\n===\tIPs INFO\t==="
+  echo -e "\n===\tIP INFO\t==="
   echo "$IPS"
 }
 function partinfo {
@@ -199,7 +200,7 @@ function screeninfo {
   echo -e "Screen Sessions:\t$SCREENINFO"
 }
 function mysqlinfo {
-  echo -e "\n===\tMySQL Info\t==="
+  echo -e "\n===\tMySQL INFO\t==="
   if [ -e $MYSQLSOCK ]
   then
     $MYSQLADM proc
@@ -337,6 +338,17 @@ function nginxinfo {
   done
 }
 
+function redisinfo {
+  REDIS="$($REDIS_CLI INFO)"
+  echo -e "\n===\tREDIS INFO\t==="
+  REDISMEM="$(cat $REDIS | grep "used_memory_human" | cut -d':' -f2- )"
+  echo -e "Used Memory:\t$REDISMEM"
+  REDISDB="$(cat $REDIS | awk '/db[0-9]/' | cut -d':' -f1 | wc -l )"
+  echo -e "Databases:\t$REDISDB"
+  REDISKEYS="$(cat $REDIS | awk '/db[0-9]/' | cut -d':' -f2 | cut -d ',' -f1 | cut -d '=' -f2 | awk '{sum += $1} END {print sum}' )"
+  echo -e "Total Keys:\t$REDISKEYS"
+}
+
 # MAIN ROUTINE
 cpuinfo
 raminfo
@@ -393,6 +405,10 @@ fi
 if [ -n "$NGINX" ]
 then
   nginxinfo
+fi
+if [ -n "$REDIS_CLI" ]
+then
+  redisinfo
 fi
 if [ "$1" == "-services" ]
 then
