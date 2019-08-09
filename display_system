@@ -41,6 +41,7 @@ DOVEADM="$(which doveadm)"
 TOR="$(which tor)"
 DOCKER="$(which docker)"
 DOCKERSOCK="/var/run/docker.sock"
+DOCKERMACHINE="$(which docker-machine)"
 WHO="$(which who)"
 NGINX="$(which nginx)"
 
@@ -308,6 +309,16 @@ function dockerinfo {
   fi
 }
 
+function dockermachineinfo {
+  echo -e "\n===\tDOCKER-MACHINE INFO\t==="
+  echo -e "STATUS\t\tNAME"
+  for CONTAINER in $($DOCKERMACHINE ls | awk '{if (NR!=1) {print $1}}');
+  do
+    STATUS=$($DOCKERMACHINE status $CONTAINER)
+    echo -e "$STATUS\t$CONTAINER"
+  done
+}
+
 function phpinfo {
   echo -e "\n===\t$PHP INFO\t==="
   ACTIVE="$(systemctl status $PHP | grep "Active" | cut -d':' -f2 | awk '{print $1}')"
@@ -389,6 +400,10 @@ fi
 if [ -n "$DOCKER" ]
 then
   dockerinfo
+fi
+if [ -n "$DOCKERMACHINE" ]
+then
+  dockermachineinfo
 fi
 if [ -n "$NGINX" ]
 then
