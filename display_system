@@ -44,6 +44,7 @@ DOCKERSOCK="/var/run/docker.sock"
 DOCKERMACHINE="$(which docker-machine)"
 WHO="$(which who)"
 NGINX="$(which nginx)"
+README="$HOME/README.txt"
 
 # FUNCTIONS
 function cpuinfo {
@@ -311,7 +312,7 @@ function dockerinfo {
 
 function dockermachineinfo {
   echo -e "\n===\tDOCKER-MACHINE INFO\t==="
-  echo -e "STATUS\t\tNAME"
+  echo -e "STATUS\tNAME"
   for CONTAINER in $($DOCKERMACHINE ls | awk '{if (NR!=1) {print $1}}');
   do
     STATUS=$($DOCKERMACHINE status $CONTAINER)
@@ -346,6 +347,11 @@ function nginxinfo {
     NAME="$(cat $CONF | grep "server_name" | sed 's/;//g' | awk '{print $2}' | sort | uniq | xargs)"
     echo -e "-\t$NAME ($LISTEN)"
   done
+}
+
+function showreadme {
+  echo -e "\n===\tREADME INFO\t==="
+  cat "$README"
 }
 
 # MAIN ROUTINE
@@ -408,6 +414,10 @@ fi
 if [ -n "$NGINX" ]
 then
   nginxinfo
+fi
+if [ -a "$README" ]
+then
+  showreadme
 fi
 if [ "$1" == "-services" ]
 then
