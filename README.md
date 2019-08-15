@@ -33,8 +33,7 @@ This script is meant to be used to be deployed automatically over ansible so it 
 
 ## Supported Services with Stats or similar:
 
-
-1. MySQLD: (root password needs to be set in /etc/mysql/my.cnf in the client section: https://stackoverflow.com/questions/13814413/how-to-auto-login-mysql-in-shell-scripts/26680426). Shows processlist, stats and active databases.
+1. MySQLD: (root password needs to be set in /etc/mysql/my.cnf in the client section: <https://stackoverflow.com/questions/13814413/how-to-auto-login-mysql-in-shell-scripts/26680426>). Shows processlist, stats and active databases.
 2. Screen: shows running screen sessions
 3. Varnish: Shows backend status with full details
 4. Bird: Shows connected BGP peers with routing details and ASN + Endpoint
@@ -47,6 +46,7 @@ This script is meant to be used to be deployed automatically over ansible so it 
 11. Docker: Lists current running container with CPU and RAM stat
 12. PHP-FPM: Shows status
 13. NGINX: Lists current vhosts
+14. Docker-Machine: Lists current docker machines with status
 
 More Services coming soon
 
@@ -57,3 +57,7 @@ Please run the programm with trigger -services to show this!
 ```
 display_system -services
 ```
+
+## Add notice for your users
+
+If you place a file called `README.txt` in the Home directory of your users it will be displayed in display_system
