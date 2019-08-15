@@ -28,9 +28,6 @@ BIRDCTL="/run/bird/bird.ctl"
 BIRD6CTL="/run/bird/bird6.ctl"
 QM="$(which qm)"
 NGINX="$(which nginx)"
-PHP56="$(which php-fpm5.6)"
-PHP70="$(which php-fpm7.0)"
-PHP72="$(which php-fpm7.2)"
 RECURSOR="$(which pdns_recursor)"
 DNSD="$(which pdns_server)"
 DNSADM="$(which pdns_control)"
@@ -351,7 +348,7 @@ function nginxinfo {
 
 function showreadme {
   echo -e "\n===\tREADME INFO\t==="
-  cat "$README"
+  fold -w 50 -s "$README"
 }
 
 # MAIN ROUTINE
