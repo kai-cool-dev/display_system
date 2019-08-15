@@ -415,6 +415,10 @@ if [ -n "$NGINX" ]
 then
   nginxinfo
 fi
+for PHP in $(systemctl list-unit-files | grep -P "php.*-fpm" | sed 's/.service//g'| awk '{print $1}')
+do
+  phpinfo
+done
 if [ -a "$README" ]
 then
   showreadme
@@ -423,7 +427,3 @@ if [ "$1" == "-services" ]
 then
   serviceinfo
 fi
-for PHP in $(systemctl list-unit-files | grep -P "php.*-fpm" | sed 's/.service//g'| awk '{print $1}')
-do
-  phpinfo
-done
