@@ -47,6 +47,7 @@ This script is meant to be used to be deployed automatically over ansible so it 
 12. PHP-FPM: Shows status
 13. NGINX: Lists current vhosts
 14. Docker-Machine: Lists current docker machines with status
+15. Redis: Lists current used Memory, Databases and Keys
 
 More Services coming soon
 

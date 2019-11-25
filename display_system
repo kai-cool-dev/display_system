@@ -41,6 +41,7 @@ DOCKERSOCK="/var/run/docker.sock"
 DOCKERMACHINE="$(which docker-machine)"
 WHO="$(which who)"
 NGINX="$(which nginx)"
+REDIS_CLI="$(which redis-cli)"
 README="$HOME/README.txt"
 
 # FUNCTIONS
@@ -346,6 +347,16 @@ function nginxinfo {
   done
 }
 
+function redisinfo {
+  echo -e "\n===\tREDIS INFO\t==="
+  REDISMEM="$($REDIS_CLI INFO | grep "used_memory_human" | cut -d':' -f2- )"
+  echo -e "Used Memory:\t$REDISMEM"
+  REDISDB="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f1 | wc -l )"
+  echo -e "Databases:\t$REDISDB"
+  REDISKEYS="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f2 | cut -d ',' -f1 | cut -d '=' -f2 | awk '{sum += $1} END {print sum}' )"
+  echo -e "Total Keys:\t$REDISKEYS"
+}
+
 function showreadme {
   echo -e "\n===\tREADME INFO\t==="
   fold -w 50 -s "$README"
@@ -411,6 +422,10 @@ fi
 if [ -n "$NGINX" ]
 then
   nginxinfo
+fi
+if [ -n "$REDIS_CLI" ]
+then
+  redisinfo
 fi
 for PHP in $(systemctl list-unit-files | grep -P "php.*-fpm" | sed 's/.service//g'| awk '{print $1}')
 do
