@@ -23,7 +23,6 @@ MYSQLD="$(which mysqld)"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
-VARNISHADMCTL="/var/lib/varnish/$(hostname -a)/_.vsm"
 BIRDCTL="/run/bird/bird.ctl"
 BIRD6CTL="/run/bird/bird6.ctl"
 QM="$(which qm)"
@@ -132,12 +131,7 @@ function proxmox {
 }
 function varnish {
   echo -e "\n===\tVARNISH\t==="
-  if [ -r $VARNISHADMCTL ]
-  then
-    $VARNISHADM backend.list -p
-  else
-    echo -e "No permissions to access varnishadm"
-  fi
+  $VARNISHADM backend.list -p
 }
 function birdc {
   echo -e "\n===\tBGP IPv4\t==="
