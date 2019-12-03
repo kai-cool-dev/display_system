@@ -41,6 +41,8 @@ DOCKERMACHINE="$(which docker-machine)"
 WHO="$(which who)"
 NGINX="$(which nginx)"
 REDIS_CLI="$(which redis-cli)"
+REDIS_SERVER="$(which redis-server)"
+REDIS_SENTINEL="$(which redis-sentinel)"
 README="$HOME/README.txt"
 
 # FUNCTIONS
@@ -342,13 +344,30 @@ function nginxinfo {
 }
 
 function redisinfo {
-  echo -e "\n===\tREDIS INFO\t==="
+  echo -e "\n===\tREDIS SERVER INFO\t==="
   REDISMEM="$($REDIS_CLI INFO | grep "used_memory_human" | cut -d':' -f2- )"
   echo -e "Used Memory:\t$REDISMEM"
   REDISDB="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f1 | wc -l )"
   echo -e "Databases:\t$REDISDB"
   REDISKEYS="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f2 | cut -d ',' -f1 | cut -d '=' -f2 | awk '{sum += $1} END {print sum}' )"
   echo -e "Total Keys:\t$REDISKEYS"
+}
+
+function redissentinelinfo {
+  echo -e "\n===\tREDIS SENTINEL INFO\t==="
+  REDISCONSLAVES="$($REDIS_CLI INFO | grep "connected_slaves" | cut -d':' -f2- )"
+  echo -e "Connected Slaves:\t$REDISCONSLAVES"
+  for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2- | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2 )
+  do
+    REDISSLAVESSTATUS="$(redis-cli INFO | grep "slave[0-9]" | grep "$SLAVE" | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
+    if [ $REDISSLAVESSTATUS == "online" ]
+    then
+      REDISSLAVESSTATUS="\e[32m$REDISSLAVESSTATUS\e[0m"
+    else
+      REDISSLAVESSTATUS="\e[31m$REDISSLAVESSTATUS\e[0m"
+    fi
+    echo -e "Slave $SLAVE is $REDISSLAVESSTATUS".
+  done
 }
 
 function showreadme {
@@ -417,9 +436,13 @@ if [ -n "$NGINX" ]
 then
   nginxinfo
 fi
-if [ -n "$REDIS_CLI" ]
+if [ -n "$REDIS_SERVER" ]
 then
   redisinfo
+fi
+if [ -n "$REDIS_SENTINEL" ]
+then
+  redissentinelinfo
 fi
 for PHP in $(systemctl list-unit-files | grep -P "php.*-fpm" | sed 's/.service//g'| awk '{print $1}')
 do
