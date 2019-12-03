@@ -360,7 +360,7 @@ function redissentinelinfo {
   for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2- | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2 )
   do
     REDISSLAVESSTATUS="$(redis-cli INFO | grep "slave[0-9]" | grep "$SLAVE" | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
-    if [ $REDISSLAVESSTATUS == "online" ]
+    if [ "$REDISSLAVESSTATUS" == "online" ]
     then
       REDISSLAVESSTATUS="\e[32m$REDISSLAVESSTATUS\e[0m"
     else
