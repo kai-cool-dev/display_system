@@ -357,10 +357,11 @@ function redissentinelinfo {
   echo -e "\n===\tREDIS SENTINEL INFO\t==="
   REDISCONSLAVES="$($REDIS_CLI INFO | grep "connected_slaves" | cut -d':' -f2- )"
   echo -e "Connected Slaves:\t$REDISCONSLAVES"
-  for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2- | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2 )
+  for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2-)
   do
-    REDISSLAVESSTATUS="$(redis-cli INFO | grep "slave[0-9]" | grep "ip=$SLAVE" | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
-    echo -e "Slave $SLAVE is $REDISSLAVESSTATUS"
+    REDISSLAVE_IP="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2)"
+    REDISSLAVE_STATE="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
+    echo -e "Slave $REDISSLAVE_IP is $REDISSLAVE_STATE"
   done
 }
 
