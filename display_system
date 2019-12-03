@@ -366,7 +366,7 @@ function redissentinelinfo {
     else
       REDISSLAVESSTATUS="\e[31m$REDISSLAVESSTATUS\e[0m"
     fi
-    echo -e "Slave $SLAVE is $REDISSLAVESSTATUS".
+    echo -e "Slave $SLAVE is $REDISSLAVESSTATUS"
   done
 }
 
