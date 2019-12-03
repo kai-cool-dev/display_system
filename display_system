@@ -361,7 +361,7 @@ function redissentinelinfo {
   do
     REDISSLAVE_IP="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2)"
     REDISSLAVE_STATE="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
-    echo -e "Slave $REDISSLAVE_IP is $REDISSLAVE_STATE"
+    echo -e "Slave $REDISSLAVE_IP\tis $REDISSLAVE_STATE"
   done
 }
 
