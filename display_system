@@ -359,7 +359,7 @@ function redissentinelinfo {
   echo -e "Connected Slaves:\t$REDISCONSLAVES"
   for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2- | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2 )
   do
-    REDISSLAVESSTATUS="$(redis-cli INFO | grep "slave[0-9]" | grep "$SLAVE" | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
+    REDISSLAVESSTATUS="$(redis-cli INFO | grep "slave[0-9]" | grep "ip=$SLAVE" | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
     echo -e "Slave $SLAVE is $REDISSLAVESSTATUS"
   done
 }
