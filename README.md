@@ -35,25 +35,6 @@ Information:
 
 This script is meant to be used to be deployed automatically over ansible so it detects services automatically. None of the service is a requirement!
 
-<<<<<<< HEAD
-Supported Services with Stats or similar:
------------------------------------------
-
-1.	MySQLD: (root password needs to be set in /etc/mysql/my.cnf in the client section: https://stackoverflow.com/questions/13814413/how-to-auto-login-mysql-in-shell-scripts/26680426). Shows processlist, stats and active databases.
-2.	Screen: shows running screen sessions
-3.	Varnish: Shows backend status with full details
-4.	Bird: Shows connected BGP peers with routing details and ASN + Endpoint
-5.	PowerDNS authorative: Shows count of zones, Uptime of DNS Server and some query stats
-6.	MDADM: Shows RAID informations. If raid is faulty also the faulty disk, recovery stat, etc
-7.	NFS: Shows active connections and lists these
-8.	Proxmox: Shows status of created VMs
-9.	Dovecot: Shows count of mailbox-user, sieve-filter and todays mails through mail.log (please edit display_system if you don't use /var/log/mail.log and please setup logrotate! currently not supported with any other logging!)
-10.	TOR: Shows ports and hidden service domains (please edit display_system if you don't use /etc/tor/torrc as your configfile)
-11.	Docker: Lists current running container with CPU and RAM stat
-12.	PHP-FPM: Shows status
-13.	NGINX: Lists current vhosts
-14.	REDIS: Shows current memory usage, summary of databases and keys
-=======
 ## Supported Services with Stats or similar:
 
 1. MySQLD: (root password needs to be set in /etc/mysql/my.cnf in the client section: <https://stackoverflow.com/questions/13814413/how-to-auto-login-mysql-in-shell-scripts/26680426>). Shows processlist, stats and active databases.
@@ -71,7 +52,6 @@ Supported Services with Stats or similar:
 13. NGINX: Lists current vhosts
 14. Docker-Machine: Lists current docker machines with status
 15. Redis: Lists current used Memory, Databases and Keys
->>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 
 More Services coming soon
 

@@ -23,10 +23,6 @@ MYSQLD="$(which mysqld)"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
-<<<<<<< HEAD
-VARNISHADMCTL="/var/lib/varnish/$(cat /etc/hostname)/_.vsm"
-=======
->>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 BIRDCTL="/run/bird/bird.ctl"
 BIRD6CTL="/run/bird/bird6.ctl"
 QM="$(which qm)"
@@ -45,12 +41,9 @@ DOCKERMACHINE="$(which docker-machine)"
 WHO="$(which who)"
 NGINX="$(which nginx)"
 REDIS_CLI="$(which redis-cli)"
-<<<<<<< HEAD
-=======
 REDIS_SERVER="$(which redis-server)"
 REDIS_SENTINEL="$(which redis-sentinel)"
 README="$HOME/README.txt"
->>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 
 # FUNCTIONS
 function cpuinfo {
@@ -351,26 +344,26 @@ function nginxinfo {
 }
 
 function redisinfo {
-<<<<<<< HEAD
-  echo -e "\n===\tREDIS INFO\t==="
-=======
+  REDIS_SERVER_IP_INFO="$(ps aux | grep "$REDIS_SERVER" | grep -v "grep" | awk '{print $12}')"
+  REDIS_SERVER_IP="$(echo $REDIS_SERVER_IP_INFO | cut -d':' -f1)"
+  REDIS_SERVER_PORT="$(echo $REDIS_SERVER_IP_INFO | cut -d':' -f2)"
   echo -e "\n===\tREDIS SERVER INFO\t==="
->>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
-  REDISMEM="$($REDIS_CLI INFO | grep "used_memory_human" | cut -d':' -f2- )"
+  REDISMEM="$($REDIS_CLI -h $REDIS_SERVER_IP -p $REDIS_SERVER_PORT INFO | grep "used_memory_human" | cut -d':' -f2- )"
   echo -e "Used Memory:\t$REDISMEM"
-  REDISDB="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f1 | wc -l )"
+  REDISDB="$($REDIS_CLI -h $REDIS_SERVER_IP -p $REDIS_SERVER_PORT INFO | awk '/db[0-9]/' | cut -d':' -f1 | wc -l )"
   echo -e "Databases:\t$REDISDB"
-  REDISKEYS="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f2 | cut -d ',' -f1 | cut -d '=' -f2 | awk '{sum += $1} END {print sum}' )"
+  REDISKEYS="$($REDIS_CLI -h $REDIS_SERVER_IP -p $REDIS_SERVER_PORT INFO | awk '/db[0-9]/' | cut -d':' -f2 | cut -d ',' -f1 | cut -d '=' -f2 | awk '{sum += $1} END {print sum}' )"
   echo -e "Total Keys:\t$REDISKEYS"
 }
 
-<<<<<<< HEAD
-=======
 function redissentinelinfo {
+  REDIS_SERVER_IP_INFO="$(ps aux | grep "$REDIS_SERVER" | grep -v "grep" | awk '{print $12}')"
+  REDIS_SERVER_IP="$(echo $REDIS_SERVER_IP_INFO | cut -d':' -f1)"
+  REDIS_SERVER_PORT="$(echo $REDIS_SERVER_IP_INFO | cut -d':' -f2)"
   echo -e "\n===\tREDIS SENTINEL INFO\t==="
-  REDISCONSLAVES="$($REDIS_CLI INFO | grep "connected_slaves" | cut -d':' -f2- )"
+  REDISCONSLAVES="$($REDIS_CLI -h $REDIS_SERVER_IP -p $REDIS_SERVER_PORT INFO | grep "connected_slaves" | cut -d':' -f2- )"
   echo -e "Connected Slaves:\t$REDISCONSLAVES"
-  for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2-)
+  for REDISSLAVE in $($REDIS_CLI -h $REDIS_SERVER_IP -p $REDIS_SERVER_PORT INFO | grep "slave[0-9]" | cut -d':' -f2-)
   do
     REDISSLAVE_IP="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2)"
     REDISSLAVE_STATE="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
@@ -383,7 +376,6 @@ function showreadme {
   fold -w 50 -s "$README"
 }
 
->>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 # MAIN ROUTINE
 cpuinfo
 raminfo
@@ -445,7 +437,6 @@ if [ -n "$NGINX" ]
 then
   nginxinfo
 fi
-<<<<<<< HEAD
 if [ -n "$REDIS_CLI" ]
 then
   redisinfo
@@ -453,7 +444,6 @@ fi
 if [ "$1" == "-services" ]
 =======
 if [ -n "$REDIS_SERVER" ]
->>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 then
   redisinfo
 fi
