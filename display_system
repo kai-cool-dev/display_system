@@ -23,14 +23,14 @@ MYSQLD="$(which mysqld)"
 BIRDC="$(which birdc)"
 BIRDC6="$(which birdc6)"
 VARNISHADM="$(which varnishadm)"
+<<<<<<< HEAD
 VARNISHADMCTL="/var/lib/varnish/$(cat /etc/hostname)/_.vsm"
+=======
+>>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 BIRDCTL="/run/bird/bird.ctl"
 BIRD6CTL="/run/bird/bird6.ctl"
 QM="$(which qm)"
 NGINX="$(which nginx)"
-PHP56="$(which php-fpm5.6)"
-PHP70="$(which php-fpm7.0)"
-PHP72="$(which php-fpm7.2)"
 RECURSOR="$(which pdns_recursor)"
 DNSD="$(which pdns_server)"
 DNSADM="$(which pdns_control)"
@@ -41,9 +41,16 @@ DOVEADM="$(which doveadm)"
 TOR="$(which tor)"
 DOCKER="$(which docker)"
 DOCKERSOCK="/var/run/docker.sock"
+DOCKERMACHINE="$(which docker-machine)"
 WHO="$(which who)"
 NGINX="$(which nginx)"
 REDIS_CLI="$(which redis-cli)"
+<<<<<<< HEAD
+=======
+REDIS_SERVER="$(which redis-server)"
+REDIS_SENTINEL="$(which redis-sentinel)"
+README="$HOME/README.txt"
+>>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 
 # FUNCTIONS
 function cpuinfo {
@@ -133,12 +140,7 @@ function proxmox {
 }
 function varnish {
   echo -e "\n===\tVARNISH\t==="
-  if [ -r $VARNISHADMCTL ]
-  then
-    $VARNISHADM backend.list -p
-  else
-    echo -e "No permissions to access varnishadm"
-  fi
+  $VARNISHADM backend.list -p
 }
 function birdc {
   echo -e "\n===\tBGP IPv4\t==="
@@ -309,6 +311,16 @@ function dockerinfo {
   fi
 }
 
+function dockermachineinfo {
+  echo -e "\n===\tDOCKER-MACHINE INFO\t==="
+  echo -e "STATUS\tNAME"
+  for CONTAINER in $($DOCKERMACHINE ls | awk '{if (NR!=1) {print $1}}');
+  do
+    STATUS=$($DOCKERMACHINE status $CONTAINER)
+    echo -e "$STATUS\t$CONTAINER"
+  done
+}
+
 function phpinfo {
   echo -e "\n===\t$PHP INFO\t==="
   ACTIVE="$(systemctl status $PHP | grep "Active" | cut -d':' -f2 | awk '{print $1}')"
@@ -339,7 +351,11 @@ function nginxinfo {
 }
 
 function redisinfo {
+<<<<<<< HEAD
   echo -e "\n===\tREDIS INFO\t==="
+=======
+  echo -e "\n===\tREDIS SERVER INFO\t==="
+>>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
   REDISMEM="$($REDIS_CLI INFO | grep "used_memory_human" | cut -d':' -f2- )"
   echo -e "Used Memory:\t$REDISMEM"
   REDISDB="$($REDIS_CLI INFO | awk '/db[0-9]/' | cut -d':' -f1 | wc -l )"
@@ -348,6 +364,26 @@ function redisinfo {
   echo -e "Total Keys:\t$REDISKEYS"
 }
 
+<<<<<<< HEAD
+=======
+function redissentinelinfo {
+  echo -e "\n===\tREDIS SENTINEL INFO\t==="
+  REDISCONSLAVES="$($REDIS_CLI INFO | grep "connected_slaves" | cut -d':' -f2- )"
+  echo -e "Connected Slaves:\t$REDISCONSLAVES"
+  for REDISSLAVE in $($REDIS_CLI INFO | grep "slave[0-9]" | cut -d':' -f2-)
+  do
+    REDISSLAVE_IP="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $1 }' | cut -d'=' -f2)"
+    REDISSLAVE_STATE="$(echo $REDISSLAVE | awk 'BEGIN { FS = "," } ; { print $3 }' | cut -d'=' -f2)"
+    echo -e "Slave $REDISSLAVE_IP\tis $REDISSLAVE_STATE"
+  done
+}
+
+function showreadme {
+  echo -e "\n===\tREADME INFO\t==="
+  fold -w 50 -s "$README"
+}
+
+>>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 # MAIN ROUTINE
 cpuinfo
 raminfo
@@ -401,19 +437,39 @@ if [ -n "$DOCKER" ]
 then
   dockerinfo
 fi
+if [ -n "$DOCKERMACHINE" ]
+then
+  dockermachineinfo
+fi
 if [ -n "$NGINX" ]
 then
   nginxinfo
 fi
+<<<<<<< HEAD
 if [ -n "$REDIS_CLI" ]
 then
   redisinfo
 fi
 if [ "$1" == "-services" ]
+=======
+if [ -n "$REDIS_SERVER" ]
+>>>>>>> 8c8d6f5ff5a1d954930be3877576d47d53b3ba4f
 then
-  serviceinfo
+  redisinfo
+fi
+if [ -n "$REDIS_SENTINEL" ]
+then
+  redissentinelinfo
 fi
 for PHP in $(systemctl list-unit-files | grep -P "php.*-fpm" | sed 's/.service//g'| awk '{print $1}')
 do
   phpinfo
 done
+if [ -a "$README" ]
+then
+  showreadme
+fi
+if [ "$1" == "-services" ]
+then
+  serviceinfo
+fi
