@@ -437,12 +437,6 @@ if [ -n "$NGINX" ]
 then
   nginxinfo
 fi
-if [ -n "$REDIS_CLI" ]
-then
-  redisinfo
-fi
-if [ "$1" == "-services" ]
-=======
 if [ -n "$REDIS_SERVER" ]
 then
   redisinfo
