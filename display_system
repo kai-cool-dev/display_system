@@ -66,7 +66,7 @@ function cpuinfo {
 }
 function raminfo {
   TOTALRAM=$($RAMINFO -m | awk '/Mem/ {print $2}')
-  FREERAM=$($RAMINFO -m | awk '/Mem/ {print $4}')
+  FREERAM=$($RAMINFO -m | awk '/Mem/ {print $7}')
   USEDRAM=$(expr $TOTALRAM - $FREERAM)
   echo -e "\n===\tRAM INFO\t==="
   echo -e "$USEDRAM MB / $TOTALRAM MB"
